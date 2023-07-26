@@ -1,6 +1,5 @@
 package Data;
 import Deserializers.Deserializer;
-import Deserializers.DeserializerAmount;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;

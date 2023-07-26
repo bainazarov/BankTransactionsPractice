@@ -1,17 +1,10 @@
 import Data.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.var;
-
 import java.io.File;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Collectors;
-
-import static java.lang.Math.decrementExact;
-import static java.lang.Math.max;
+import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {
@@ -21,17 +14,17 @@ public class Main {
         if (consumerData != null) {
             // 1
             int countNonZeroCreditLimitCount1 = countNonZeroCreditLimit(consumerData);
-            System.out.println("Сделка с не нулевым кредитным лимитом " + countNonZeroCreditLimitCount1);
+            System.out.println("Сделка с не нулевым кредитным лимитом: " + countNonZeroCreditLimitCount1);
             // 2
             double findMaxBalance1 = findMaxBalance(consumerData);
-            System.out.println("Максимальный баланс по всем сделками " + findMaxBalance1);
+            System.out.println("Максимальный баланс по всем сделками: " + findMaxBalance1);
             // 3
             String findDealWithMaxCreditLimit1 = findDealWithMaxCreditLimit(consumerData);
-            System.out.println("Тип сделки с самым большим кредитным лимитом за последние полтора года " + findDealWithMaxCreditLimit1);
+            System.out.println("Тип сделки с самым большим кредитным лимитом за последние полтора года: " + findDealWithMaxCreditLimit1);
 
             // 4
-
-
+            int countLastTwoYears1 = countLastTwoYears(consumerData);
+            System.out.println("Общее количество обновлений с просрочкой за последние 2 года: " + countLastTwoYears1);
         }
     }
 
@@ -46,7 +39,7 @@ public class Main {
     }
 
     private static int countNonZeroCreditLimit(Consumer consumerData) {
-        return  consumerData.getConsumerData().getCais().stream()
+        return consumerData.getConsumerData().getCais().stream()
                 .flatMap(cais -> cais.getCaisDetails().stream())
                 .filter(details -> details.getCreditLimit() != null && details.getCreditLimit().getAmount() > 0)
                 .mapToInt(details -> 1)
@@ -54,13 +47,14 @@ public class Main {
     }
 
     private static double findMaxBalance(Consumer consumerData) {
-         return consumerData.getConsumerData().getCais().stream()
+        return consumerData.getConsumerData().getCais().stream()
                 .flatMap(cais -> cais.getCaisDetails().stream())
-                .flatMap(details -> details.getAccountBalances().stream())
-                 .filter(AccountBalances -> AccountBalances.getAccountBalances() != null)
-                .map(AccountBalances -> Double.parseDouble(AccountBalances.getAccountBalances()))
-                 .max(Comparator.naturalOrder())
-                 .orElse(0.0);
+                .map(CAISDetails::getBalance)
+                .filter(Objects::nonNull)
+                .mapToDouble(Balance::getAmount)
+                .max()
+                .orElse(0);
+
     }
 
     private static String findDealWithMaxCreditLimit(Consumer consumerData) {
@@ -69,18 +63,25 @@ public class Main {
                 .flatMap(cais -> cais.getCaisDetails().stream())
                 .filter(deal -> deal.getCaisAccStartDate().isAfter(yearAndHalf))
                 .filter(deal -> deal.getCreditLimit() != null)
-                .max(Comparator.comparing(deal ->  deal.getCreditLimit().getAmount()))
+                .max(Comparator.comparing(deal -> deal.getCreditLimit().getAmount()))
                 .map(CAISDetails::getAccountType)
                 .orElse("");
     }
 
     private static int countLastTwoYears(Consumer consumerData) {
-        LocalDate startDate = LocalDate.now().minusYears(2);
-        return consumerData.getConsumerData().getCais().stream()
-                .flatMap(deal -> deal.getCaisDetails().stream())
-                .filter(deal -> deal.getCaisAccStartDate().isAfter(startDate))
-                .flatMap(details -> details.getAccountBalances().stream())
-                .filter(balance -> balance.getStatus().compareTo(String.valueOf(BigDecimal.ZERO)) > 0)
-                .mapToInt
+        LocalDate now = LocalDate.now();
+        LocalDate yearAndHalf = now.minusYears(1).minusMonths(6);
+        LocalDate twoYears = now.minusYears(2);
+        return (int) consumerData.getConsumerData().getCais().stream()
+                .flatMap(cais -> cais.getCaisDetails().stream())
+                .filter(caisDetails -> caisDetails.getCaisAccStartDate().isAfter(twoYears))
+                .flatMap(caisDetails -> {
+                    int months = (int) ChronoUnit.MONTHS.between(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate());
+                    int months1 = (int) ChronoUnit.MONTHS.between(yearAndHalf, now);
+                    return caisDetails.getAccountBalances().stream()
+                            .map(AccountBalances::getStatus)
+                            .limit(Math.max(months,months1));
+                })
+                .count();
     }
 }
