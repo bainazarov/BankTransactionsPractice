@@ -1,7 +1,7 @@
-package Data;
+package data;
 
-import Deserializers.DeserializerMM;
-import Deserializers.DeserializerYY;
+import deserializers.DeserializerMM;
+import deserializers.DeserializerYY;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 

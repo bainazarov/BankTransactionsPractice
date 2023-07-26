@@ -1,4 +1,4 @@
-package Data;
+package data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -6,11 +6,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CAIS {
+public class CIFAS {
     @JsonProperty("LocationIndicator")
     private String locationIndicator;
     @JsonProperty("ApplicantIndicator")
     private String applicantIndicator;
-    @JsonProperty("CAISDetails")
-    private List<CAISDetails> caisDetails;
+    @JsonProperty("CIFASDetails")
+    private List<CIFASDetails> cifasDetails;
 }
