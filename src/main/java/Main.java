@@ -79,7 +79,7 @@ public class Main {
                     int months = (int) ChronoUnit.MONTHS.between(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate());
                     int months1 = (int) ChronoUnit.MONTHS.between(yearAndHalfAgo, now);
 
-                    int limit = Math.min(months, months1);
+                    // установить правильный промежуток
 
                     return caisDetails.getAccountBalances().stream().limit(limit);
                 })
