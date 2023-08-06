@@ -69,20 +69,21 @@ public class Main {
 
     private static int countLastTwoYears(Consumer consumerData) {
         LocalDate now = LocalDate.now();
-        LocalDate yearAndHalf = now.minusYears(1).minusMonths(6);
-        LocalDate twoYears = now.minusYears(2);
+        LocalDate yearAndHalfAgo = now.minusYears(1).minusMonths(6);
+        LocalDate twoYearsAgo = now.minusYears(2);
 
-        return (int) consumerData.getConsumerData().getCais().stream()
+        return consumerData.getConsumerData().getCais().stream()
                 .flatMap(cais -> cais.getCaisDetails().stream())
-                .filter(caisDetails -> caisDetails.getCaisAccStartDate().isAfter(twoYears))
+                .filter(caisDetails -> caisDetails.getCaisAccStartDate().isAfter(twoYearsAgo))
                 .flatMap(caisDetails -> {
                     int months = (int) ChronoUnit.MONTHS.between(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate());
-                    int months1 = (int) ChronoUnit.MONTHS.between(yearAndHalf, now);
+                    int months1 = (int) ChronoUnit.MONTHS.between(yearAndHalfAgo, now);
+
                     int limit = Math.min(months, months1);
 
-                    return caisDetails.getAccountBalances().stream()
-                            .limit(limit);
+                    return caisDetails.getAccountBalances().stream().limit(limit);
                 })
-                .count();
+                .mapToInt(balance -> 1)
+                .sum();
     }
 }
