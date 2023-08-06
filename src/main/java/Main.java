@@ -21,7 +21,6 @@ public class Main {
             // 3
             String findDealWithMaxCreditLimit1 = findDealWithMaxCreditLimit(consumerData);
             System.out.println("Тип сделки с самым большим кредитным лимитом за последние полтора года: " + findDealWithMaxCreditLimit1);
-
             // 4
             int countLastTwoYears1 = countLastTwoYears(consumerData);
             System.out.println("Общее количество обновлений с просрочкой за последние 2 года: " + countLastTwoYears1);
@@ -72,15 +71,17 @@ public class Main {
         LocalDate now = LocalDate.now();
         LocalDate yearAndHalf = now.minusYears(1).minusMonths(6);
         LocalDate twoYears = now.minusYears(2);
+
         return (int) consumerData.getConsumerData().getCais().stream()
                 .flatMap(cais -> cais.getCaisDetails().stream())
                 .filter(caisDetails -> caisDetails.getCaisAccStartDate().isAfter(twoYears))
                 .flatMap(caisDetails -> {
                     int months = (int) ChronoUnit.MONTHS.between(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate());
                     int months1 = (int) ChronoUnit.MONTHS.between(yearAndHalf, now);
+                    int limit = Math.min(months, months1);
+
                     return caisDetails.getAccountBalances().stream()
-                            .map(AccountBalances::getStatus)
-                            .limit(Math.max(months,months1));
+                            .limit(limit);
                 })
                 .count();
     }
