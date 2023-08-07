@@ -76,13 +76,16 @@ public class Main {
                 .flatMap(cais -> cais.getCaisDetails().stream())
                 .filter(caisDetails -> caisDetails.getCaisAccStartDate().isAfter(twoYearsAgo))
                 .flatMap(caisDetails -> {
-                    int months = (int) ChronoUnit.MONTHS.between(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate());
-                    int months1 = (int) ChronoUnit.MONTHS.between(yearAndHalfAgo, now);
-                    long limit = Math.max(0, Math.min(months, months1));
 
+                    int limit = countOverlapMonths(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate(), yearAndHalfAgo, now);
                     return caisDetails.getAccountBalances().stream().limit(limit);
                 })
                 .mapToInt(balance -> 1)
                 .sum();
+    }
+
+    private static int countOverlapMonths(LocalDate startDate1, LocalDate endDate1, LocalDate startDate2, LocalDate endDate2) {
+        int overlapMonths = Math.max(0, Math.min(endDate1.getMonthValue(), endDate2.getMonthValue()) - Math.max(startDate1.getMonthValue(), startDate2.getMonthValue()) + 1);
+        return overlapMonths;
     }
 }
