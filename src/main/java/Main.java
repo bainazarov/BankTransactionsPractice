@@ -86,7 +86,20 @@ public class Main {
     }
 
     private static int countOverlapMonths(LocalDate startDate1, LocalDate endDate1, LocalDate startDate2, LocalDate endDate2) {
-        int overlapMonths = Math.max(0, Math.min(endDate1.getMonthValue(), endDate2.getMonthValue()) - Math.max(startDate1.getMonthValue(), startDate2.getMonthValue()) + 1);
+        int overlapMonths = 0;
+
+        LocalDate startDate = (startDate1.isAfter(startDate2)) ? startDate1 : startDate2;
+        LocalDate endDate = (endDate1.isBefore(endDate2)) ? endDate1 : endDate2;
+
+        if (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
+            int overlapYears = endDate.getYear() - startDate.getYear();
+
+            if (overlapYears > 0) {
+                overlapMonths += overlapYears * 12;
+            }
+            int overlapMonthsInYear = endDate.getMonthValue() - startDate.getMonthValue();
+            overlapMonths += overlapMonthsInYear + 1;
+        }
         return overlapMonths;
     }
 }
