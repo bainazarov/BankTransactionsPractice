@@ -91,7 +91,7 @@ public class Main {
         LocalDate startDate = (startDate1.isAfter(startDate2)) ? startDate1 : startDate2;
         LocalDate endDate = (endDate1.isBefore(endDate2)) ? endDate1 : endDate2;
 
-        if (startDate.isBefore(endDate) || startDate.isEqual(endDate)) {
+        if (startDate.isBefore(endDate)) {
             int overlapYears = endDate.getYear() - startDate.getYear();
 
             if (overlapYears > 0) {
