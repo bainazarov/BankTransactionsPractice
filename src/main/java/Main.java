@@ -2,6 +2,7 @@ import data.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.Objects;
@@ -77,7 +78,7 @@ public class Main {
                 .filter(caisDetails -> caisDetails.getCaisAccStartDate().isAfter(twoYearsAgo))
                 .flatMap(caisDetails -> {
 
-                    int limit = countOverlapMonths(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate(), yearAndHalfAgo, now);
+                    int limit = countOverlapMonths(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate(), now, yearAndHalfAgo);
                     return caisDetails.getAccountBalances().stream().limit(limit);
                 })
                 .mapToInt(balance -> 1)
