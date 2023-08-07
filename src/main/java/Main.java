@@ -78,8 +78,7 @@ public class Main {
                 .flatMap(caisDetails -> {
                     int months = (int) ChronoUnit.MONTHS.between(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate());
                     int months1 = (int) ChronoUnit.MONTHS.between(yearAndHalfAgo, now);
-
-                    // установить правильный промежуток
+                    long limit = Math.max(0, Math.min(months, months1));
 
                     return caisDetails.getAccountBalances().stream().limit(limit);
                 })
