@@ -78,7 +78,7 @@ public class Main {
                 .filter(caisDetails -> caisDetails.getCaisAccStartDate().isAfter(twoYearsAgo))
                 .flatMap(caisDetails -> {
 
-                    int limit = countOverlapMonths(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate(), now, yearAndHalfAgo);
+                    int limit = countOverlapMonths(caisDetails.getCaisAccStartDate(), caisDetails.getLastUpdatedDate(), yearAndHalfAgo, now);
                     return caisDetails.getAccountBalances().stream().limit(limit);
                 })
                 .mapToInt(balance -> 1)
